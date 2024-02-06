@@ -6,7 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "YDict"
+name = "abcDict"
 version = "0.0.1"
 authors = [
     { name="msbrm", email="cuihaniss@gmail.com" },
@@ -20,5 +20,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/msbrm/YamlDict/tree/main"
-"Bug Tracker" = "https://github.com/msbrm/YamlDict/issues"
+"Homepage" = "https://github.com/msbrm/abcDict/tree/main"
+"Bug Tracker" = "https://github.com/msbrm/abcDict/issues"

@@ -1,1 +1,1 @@
-from yamldict import YamlDict
+from abcdict import YamlDict

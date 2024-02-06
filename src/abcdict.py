@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 
 
-class YamlDict(dict):
+class AbcDict(dict):
     __k_keylist__ = [
         'update',
         'pop',
@@ -35,8 +35,8 @@ class YamlDict(dict):
             ]
         elif isinstance(value, dict) and not isinstance(value, self.__class__):
             value = self.__class__(value)
-        super(YamlDict, self).__setattr__(name, value)
-        super(YamlDict, self).__setitem__(name, value)
+        super(AbcDict, self).__setattr__(name, value)
+        super(AbcDict, self).__setitem__(name, value)
 
     __setitem__ = __setattr__
 
@@ -64,7 +64,7 @@ class YamlDict(dict):
 
     def pop(self, k, d=None):
         delattr(self, k)
-        return super(YamlDict, self).pop(k, d)
+        return super(AbcDict, self).pop(k, d)
 
     def merge(self, d):
         self.__init__(d)
