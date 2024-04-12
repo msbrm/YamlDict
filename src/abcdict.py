@@ -1,3 +1,4 @@
+import os
 import json
 from pathlib import Path
 
@@ -16,6 +17,9 @@ class AbcDict(dict):
     def __init__(self, d=None, **kwargs):
         d = self.__load__(d, **kwargs)
         for k, v in d.items():
+            if isinstance(v, str):
+                if v.startswith('${') and v.endswith('}'):
+                    v = os.getenv(v[2: -1])
             setattr(self, k, v)
 
         for k in self.__class__.__dict__.keys():
