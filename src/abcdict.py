@@ -19,7 +19,24 @@ class AbcDict(dict):
         for k, v in d.items():
             if isinstance(v, str):
                 if v.startswith('${') and v.endswith('}'):
-                    v = os.getenv(v[2: -1])
+                    type_dict = {
+                        'int': int,
+                        'float': float,
+                        'str': str
+                    }
+                    env_k = v[2: -1]
+                    v_default, v_type = None, None
+                    if '|' in env_k:
+                        key_item = env_k.split('|')
+                        for info in key_item[1:]:
+                            if info.startswith('default:'):
+                                v_default = info.strip().replace('default:', '')
+                            if info.startswith('type:'):
+                                v_type = info.strip().replace('type:', '')
+                        env_k = key_item[0]
+                    v = os.getenv(env_k, v_default)
+                    if v_type in type_dict:
+                        v = type_dict[v_type](v)
             setattr(self, k, v)
 
         for k in self.__class__.__dict__.keys():
