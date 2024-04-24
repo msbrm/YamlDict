@@ -14,29 +14,34 @@ class AbcDict(dict):
         'dump'
     ]
 
+    __env_reType_dict__ = {
+        'int': int,
+        'float': float,
+        'str': str
+    }
+
+    def __get_env__(self, v):
+        env_k = v[2: -1]
+        v_default, v_type = None, None
+        if '|' in env_k:
+            key_item = env_k.split('|')
+            for info in key_item[1:]:
+                if info.startswith('default:'):
+                    v_default = info.strip().replace('default:', '')
+                if info.startswith('type:'):
+                    v_type = info.strip().replace('type:', '')
+            env_k = key_item[0]
+        v = os.getenv(env_k, v_default)
+        if v_type in self.__env_reType_dict__:
+            v = self.__env_reType_dict__[v_type](v)
+        return v
+
     def __init__(self, d=None, **kwargs):
         d = self.__load__(d, **kwargs)
         for k, v in d.items():
             if isinstance(v, str):
                 if v.startswith('${') and v.endswith('}'):
-                    type_dict = {
-                        'int': int,
-                        'float': float,
-                        'str': str
-                    }
-                    env_k = v[2: -1]
-                    v_default, v_type = None, None
-                    if '|' in env_k:
-                        key_item = env_k.split('|')
-                        for info in key_item[1:]:
-                            if info.startswith('default:'):
-                                v_default = info.strip().replace('default:', '')
-                            if info.startswith('type:'):
-                                v_type = info.strip().replace('type:', '')
-                        env_k = key_item[0]
-                    v = os.getenv(env_k, v_default)
-                    if v_type in type_dict:
-                        v = type_dict[v_type](v)
+                    v = self.__get_env__(v)
             setattr(self, k, v)
 
         for k in self.__class__.__dict__.keys():
