@@ -92,7 +92,7 @@ class AbcDict(dict):
         delattr(self, k)
         return super(AbcDict, self).pop(k, d)
 
-    def merge(self, d):
+    def merge(self, d, **kwargs):
         self.__init__(d)
 
     def deep_merge(self, d=None, **kwargs):
