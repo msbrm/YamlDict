@@ -1,0 +1,12 @@
+file_path: /home/abc/abc.test
+info:
+  age: null
+  age_default: '18'
+  age_default_int: 18
+  name: null
+  name_default: msbrm
+  none1: ''
+  none2: None
+info_str: 我是name:None,name_default:$<name>,今年刚满age:None,age_default:18岁
+info_str2: Nonexxxxxxx18xxxxxxxNone
+path: C:\ProgramData

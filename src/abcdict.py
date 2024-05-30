@@ -1,11 +1,14 @@
-import os
 import json
 from pathlib import Path
 
 import yaml
 
+from .abcutil import replace_env_variables
+
 
 class AbcDict(dict):
+    __charset__ = 'UTF-8'
+
     __k_keylist__ = [
         'update',
         'pop',
@@ -20,28 +23,12 @@ class AbcDict(dict):
         'str': str
     }
 
-    def __get_env__(self, v):
-        env_k = v[2: -1]
-        v_default, v_type = None, None
-        if '|' in env_k:
-            key_item = env_k.split('|')
-            for info in key_item[1:]:
-                if info.startswith('default:'):
-                    v_default = info.strip().replace('default:', '')
-                if info.startswith('type:'):
-                    v_type = info.strip().replace('type:', '')
-            env_k = key_item[0]
-        v = os.getenv(env_k, v_default)
-        if v_type in self.__env_reType_dict__:
-            v = self.__env_reType_dict__[v_type](v)
-        return v
-
     def __init__(self, d=None, **kwargs):
         d = self.__load__(d, **kwargs)
         for k, v in d.items():
             if isinstance(v, str):
-                if v.startswith('${') and v.endswith('}'):
-                    v = self.__get_env__(v)
+                if '${' in v:
+                    v = replace_env_variables(v)
             setattr(self, k, v)
 
         for k in self.__class__.__dict__.keys():
@@ -75,7 +62,7 @@ class AbcDict(dict):
                 ), f'parameter {d} error'
                 _d = Path(d) if isStr else d
                 assert _d.exists(), f'{d} not find'
-                d = yaml.safe_load(_d.open('r').read())
+                d = yaml.safe_load(_d.open('r', encoding=self.__charset__).read())
             else:
                 d = {}
         if kwargs:
@@ -105,5 +92,9 @@ class AbcDict(dict):
     def dump(self, save_path):
         if isinstance(save_path, str):
             save_path = Path(save_path)
-        jsons = json.loads(str(self).replace("'", '"'))
-        yaml.safe_dump(jsons, save_path.open('w'))
+        jsons = json.loads(str(self).replace("'", '"').replace(' None', ' null'))
+        yaml.safe_dump(
+            jsons,
+            save_path.open('w', encoding=self.__charset__),
+            allow_unicode=True
+        )

@@ -1,14 +1,34 @@
 import os
 import re
 import time
+from typing import Union
+
+pattern = re.compile(r'\$\{([^{}]+?)\}')
 
 
 def get_now_str(format='%Y%m%d%H%M%S') -> str:
     return time.strftime(format)
 
 
-def isTrue(obj):
-    pass
+def isTrue(value):
+    false_values = {'false', 'no', '0', 'n', 'f', ''}
+    true_values = {'true', 'yes', '1', 'y', 't'}
+
+    if isinstance(value, bool):
+        return value
+
+    if value is None:
+        return False
+
+    if isinstance(value, str):
+        str_value = str(value).strip().lower()
+
+        if str_value in false_values:
+            return False
+        elif str_value in true_values:
+            return True
+
+    return value
 
 
 def seconds2hms(seconds):
@@ -19,45 +39,37 @@ def seconds2hms(seconds):
     return int(hours), int(minutes), int(seconds)
 
 
-def replace_env_variables(text):
-    # 匹配 ${ENV_NAME} 形式的占位符
-    pattern = re.compile(r'\$\{(\w+)\}')
-
-    def replace_match(match):
-        # 获取环境变量名称
-        env_name = match.group(1)
-        # 获取环境变量的值，默认空字符串
-        return os.getenv(env_name, '')
-
-    # 替换所有匹配的占位符
-    return pattern.sub(replace_match, text)
-
-    # # 示例字符串
-    # example_text = "This is a path: ${HOME} and this is a user: ${USER}"
-
-    # # 替换占位符
-    # result = replace_env_variables(example_text)
-
-    # print(result)
+def replace_env_variables(text: str) -> str:
+    matches = re.finditer(pattern, text)
+    match = matches.__next__()
+    value = retrieve_environment(match.group(1))
+    if match.regs[0][0] == 0 and match.regs[0][1] == len(text):
+        return value
+    else:
+        text = text.replace(match.group(0), str(value))
+    for match in matches:
+        value = retrieve_environment(match.group(1))
+        text = text.replace(match.group(0), str(value))
+    return text
 
 
-def replace_env_variables(text):
-    # 使用非贪婪匹配模式
-    pattern = re.compile(r'\$\{(\w+?)\}')
+def retrieve_environment(env_k: str) -> Union[str, int, float]:
+    env_reType_dict = {
+        'int': int,
+        'float': float,
+        'str': str
+    }
 
-    def replace_match(match):
-        # 获取环境变量名称
-        env_name = match.group(1)
-        # 获取环境变量的值，默认空字符串
-        return os.getenv(env_name, '')
-
-    # 替换所有匹配的占位符
-    return pattern.sub(replace_match, text)
-
-    # # 示例字符串包含多个占位符
-    # example_text = "This is a path: ${HOME}, this is a user: ${USER}, and the shell is: ${SHELL}. Another path: ${PATH}."
-
-    # # 替换占位符
-    # result = replace_env_variables(example_text)
-
-    # print(result)
+    v_default, v_type = None, None
+    if '|' in env_k:
+        key_item = env_k.split('|')
+        for info in key_item[1:]:
+            if info.startswith('default:'):
+                v_default = info.strip().replace('default:', '')
+            if info.startswith('type:'):
+                v_type = info.strip().replace('type:', '')
+        env_k = key_item[0]
+    v = os.getenv(env_k, v_default)
+    if v_type in env_reType_dict:
+        v = env_reType_dict[v_type](v)
+    return v
