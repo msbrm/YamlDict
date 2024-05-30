@@ -39,3 +39,25 @@ def replace_env_variables(text):
     # result = replace_env_variables(example_text)
 
     # print(result)
+
+
+def replace_env_variables(text):
+    # 使用非贪婪匹配模式
+    pattern = re.compile(r'\$\{(\w+?)\}')
+
+    def replace_match(match):
+        # 获取环境变量名称
+        env_name = match.group(1)
+        # 获取环境变量的值，默认空字符串
+        return os.getenv(env_name, '')
+
+    # 替换所有匹配的占位符
+    return pattern.sub(replace_match, text)
+
+    # # 示例字符串包含多个占位符
+    # example_text = "This is a path: ${HOME}, this is a user: ${USER}, and the shell is: ${SHELL}. Another path: ${PATH}."
+
+    # # 替换占位符
+    # result = replace_env_variables(example_text)
+
+    # print(result)
