@@ -34,7 +34,22 @@ from src import AbcDict
 yaml_file = FILE_PATH.with_suffix('.yaml')
 
 abcDict = AbcDict(yaml_file)
+
+print(abcDict.path)
+print(abcDict.info.age_default_int)
+print(type(abcDict.info.age_default_int))
+print(abcDict)
+
 abcDict.dump(yaml_file.with_stem('save'))  # save as save.yaml
+```
+
+```txt
+# cmd output
+> python .\test\abctest.py
+C:\ProgramData
+18
+<class 'int'>
+{'path': 'C:\\ProgramData', 'info': {'none1': '', 'none2': 'None', 'name': None, 'name_default': 'msbrm', 'age': None, 'age_default': '18', 'age_default_int': 18}, 'info_str': '我是name:None,name_default:$<name>,今年刚满age:None,age_default:18岁', 'info_str2': 'C:\\Users\\Administratorxxxxxxx18xxxxxxxC:\\Users\\Administrator', 'file_path': '/home/abc/abc.test'}
 ```
 
 ```yaml
@@ -49,6 +64,6 @@ info:
   none1: ''
   none2: None
 info_str: 我是name:None,name_default:$<name>,今年刚满age:None,age_default:18岁
-info_str2: Nonexxxxxxx18xxxxxxxNone
+info_str2: C:\Users\Administratorxxxxxxx18xxxxxxxC:\Users\Administrator
 path: C:\ProgramData
 ```
