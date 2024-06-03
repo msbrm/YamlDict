@@ -3,7 +3,7 @@
 ## example
 
 ```yaml
-# test.yaml
+# abctest.yaml
 path: ${ALLUSERSPROFILE}
 
 info:
@@ -18,4 +18,25 @@ info:
 info_str: 我是name:${name},name_default:${name|default:$<name>},今年刚满age:${age},age_default:${age|default:18}岁
 info_str2: ${HOME}xxxxxxx${age|default:18|type:int}xxxxxxx${HOME}
 file_path: /home/${FILE|default:abc}/abc.test
+```
+
+```python
+# abctest.py
+import sys
+from pathlib import Path
+
+FILE_PATH = Path(__file__)
+
+sys.path.append(str(FILE_PATH.parent.parent))
+
+from src import AbcDict
+
+yaml_file = FILE_PATH.with_suffix('.yaml')
+
+abcDict = AbcDict(yaml_file)
+abcDict.dump(yaml_file.with_stem('save'))  # save as save.yaml
+```
+
+```yaml
+# save.yaml
 ```
