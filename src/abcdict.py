@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from .abcutil import replace_env_variables
+from abcutil import replace_env_variables
 
 
 class AbcDict(dict):
